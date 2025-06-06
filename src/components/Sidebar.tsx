@@ -97,6 +97,15 @@ export default function Sidebar({
           <p className="hint">Click any node to expand search</p>
         </div>
       )}
+      <div className="sidebar-footer">
+        <a
+          href="https://github.com/Andres77872/spyder.findit.moe"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          View on GitHub
+        </a>
+      </div>
     </div>
   )
 }
