@@ -2,8 +2,8 @@ import React, {useState} from 'react'
 import ForceGraph3DTemplate from './ForceGraph3DTemplate'
 
 interface SearchResultAPIItem {
-  vector: number[]
-  content?: Array<{ img: string; query: string }>
+    vector: number[]
+    content?: Array<{ img: string; query: string }>
 }
 
 export default function App() {
@@ -57,7 +57,8 @@ export default function App() {
             form.append('rating', 'g,s,q,e')
 
             const res = await fetch(
-                'http://192.168.1.8:5010/search/image/file',
+                // 'http://192.168.1.8:5010/search/image/file',
+                'https://api.findit.moe/search/image/file',
                 {
                     method: 'POST',
                     body: form,
@@ -74,7 +75,7 @@ export default function App() {
                 .map(item => {
                     const img = item.content?.[0]?.img
                     const query = item.content?.[0]?.query
-                    return img && query ? { vector: item.vector, img, query } : null
+                    return img && query ? {vector: item.vector, img, query} : null
                 })
                 .filter((x): x is { vector: number[]; img: string; query: string } => x !== null)
             // Remove duplicate items by image URL
@@ -106,8 +107,9 @@ export default function App() {
             form.append('rating', 'g,s,q,e')
 
             const res = await fetch(
-                'http://192.168.1.8:5010/search/image/query',
-                { method: 'POST', body: form }
+                // 'http://192.168.1.8:5010/search/image/query',
+                'https://api.findit.moe/search/image/query',
+                {method: 'POST', body: form}
             )
             if (!res.ok) throw new Error(`Server responded with ${res.status}`)
             const jsonResp = await res.json()
@@ -118,7 +120,7 @@ export default function App() {
                 .map(item => {
                     const img = item.content?.[0]?.img
                     const query = item.content?.[0]?.query
-                    return img && query ? { vector: item.vector, img, query } : null
+                    return img && query ? {vector: item.vector, img, query} : null
                 })
                 .filter((x): x is { vector: number[]; img: string; query: string } => x !== null)
             // Append only new items with unique image URLs
@@ -142,10 +144,10 @@ export default function App() {
         }
     }
 
-    return (
-        <div className="app-container">
+    if (!file) {
+        return (
             <div
-                className={`upload-area${dragActive ? ' active' : ''}`}
+                className="landing-uploader"
                 onDragOver={handleDragOver}
                 onDragEnter={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -156,43 +158,50 @@ export default function App() {
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    style={{ display: 'none' }}
+                    style={{display: 'none'}}
                 />
-                <label htmlFor="fileInput" className="upload-label">
-                    {file ? (
-                        <img
-                            src={URL.createObjectURL(file)}
-                            alt="Preview"
-                            className="preview-image"
-                        />
-                    ) : (
-                        <span>Drag & drop an image here, or click to select</span>
-                    )}
+                <label htmlFor="fileInput" className={`upload-area${dragActive ? ' active' : ''}`}>
+                    <div className="landing-content">
+                        <h1>FindIt</h1>
+                        <p>Drag & drop an image here, or click to select</p>
+                    </div>
                 </label>
             </div>
-            <div className="controls">
-                <button onClick={handleUpload} disabled={!file || loading}>
-                    {loading ? 'Searching...' : 'Search'}
-                </button>
-                {dataItems.length > 0 && !loading && (
-                    <button
-                        onClick={() => {
-                            setDataItems([])
-                            setFile(null)
-                            setError(null)
-                        }}
-                    >
-                        Clear Results
+        )
+    }
+
+    return (
+        <div className="app-container loaded">
+            <div className="sidebar">
+                <img
+                    src={URL.createObjectURL(file)}
+                    alt="Preview"
+                    className="preview-image"
+                />
+                <div className="controls">
+                    <button onClick={handleUpload} disabled={loading}>
+                        {loading ? 'Searching...' : 'Search'}
                     </button>
+                    <button onClick={() => {
+                        setFile(null);
+                        setDataItems([]);
+                        setError(null);
+                        setDragActive(false);
+                    }} disabled={loading}>
+                        Clear
+                    </button>
+                </div>
+                {error && <div className="error-message">{error}</div>}
+            </div>
+            <div className="graph-container">
+                {loading && <div className="loading-overlay">Searching...</div>}
+                {dataItems.length > 0 && !loading && (
+                    <ForceGraph3DTemplate
+                        dataItems={dataItems}
+                        onNodeClick={handleNodeClick}
+                    />
                 )}
             </div>
-            {error && <div className="error-message">{error}</div>}
-            {dataItems.length > 0 && (
-                <ForceGraph3DTemplate
-                    dataItems={dataItems}
-                    onNodeClick={handleNodeClick}
-                />
-            )}
         </div>
     )
 }

@@ -46,10 +46,6 @@
   background-color: rgba(0, 0, 0, 0.05);
 }
 
-.upload-label span {
-  font-size: 1rem;
-  color: #666;
-}
 
 .preview-image {
   max-width: 100%;
@@ -71,4 +67,78 @@
   color: #f44336;
   font-weight: bold;
   text-align: center;
+}
+
+/* Landing page full-screen uploader */
+.landing-uploader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+}
+
+.landing-content h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  color: #333;
+}
+
+.landing-content p {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #555;
+}
+
+/* Main view layout when file is loaded */
+.app-container.loaded {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 300px;
+  padding: 1rem;
+  background-color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  overflow-y: auto;
+}
+
+.graph-container {
+  flex: 1;
+  position: relative;
+  background: #fff;
+}
+
+.sidebar .preview-image {
+  width: 100%;
+  height: auto;
+  max-height: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  z-index: 3;
 }
