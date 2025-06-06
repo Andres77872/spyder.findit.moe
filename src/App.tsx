@@ -1,6 +1,11 @@
 import React, {useState} from 'react'
 import ForceGraph3DTemplate from './ForceGraph3DTemplate'
 
+interface SearchResultAPIItem {
+  vector: number[]
+  content?: Array<{ img: string; query: string }>
+}
+
 export default function App() {
     const [file, setFile] = useState<File | null>(null)
     const [dataItems, setDataItems] = useState<{ vector: number[]; img: string; query: string }[]>([])
@@ -43,19 +48,22 @@ export default function App() {
             if (!jsonResp.results?.data || !Array.isArray(jsonResp.results.data)) {
                 throw new Error('Unexpected API response format')
             }
-            const items = jsonResp.results.data.map((item: any) => ({
-                vector: item.vector as number[],
-                img: item.content?.[0]?.img,
-                query: item.content?.[0]?.query,
-            }))
+            const items = (jsonResp.results.data as SearchResultAPIItem[])
+                .map(item => {
+                    const img = item.content?.[0]?.img
+                    const query = item.content?.[0]?.query
+                    return img && query ? { vector: item.vector, img, query } : null
+                })
+                .filter((x): x is { vector: number[]; img: string; query: string } => x !== null)
             // Remove duplicate items by image URL
             const uniqueItems = items.filter((item, index, self) =>
                 self.findIndex(i => i.img === item.img) === index
             )
             setDataItems(uniqueItems)
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err)
-            setError(err.message || 'Error fetching vectors')
+            const message = err instanceof Error ? err.message : String(err)
+            setError(message || 'Error fetching vectors')
         } finally {
             setLoading(false)
         }
@@ -84,11 +92,13 @@ export default function App() {
             if (!jsonResp.results?.data || !Array.isArray(jsonResp.results.data)) {
                 throw new Error('Unexpected API response format')
             }
-            const items = jsonResp.results.data.map((item: any) => ({
-                vector: item.vector as number[],
-                img: item.content?.[0]?.img,
-                query: item.content?.[0]?.query,
-            }))
+            const items = (jsonResp.results.data as SearchResultAPIItem[])
+                .map(item => {
+                    const img = item.content?.[0]?.img
+                    const query = item.content?.[0]?.query
+                    return img && query ? { vector: item.vector, img, query } : null
+                })
+                .filter((x): x is { vector: number[]; img: string; query: string } => x !== null)
             // Append only new items with unique image URLs
             setDataItems(prevItems => {
                 const merged = [...prevItems]
@@ -101,9 +111,10 @@ export default function App() {
                 }
                 return merged
             })
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err)
-            setError(err.message || 'Error fetching vectors')
+            const message = err instanceof Error ? err.message : String(err)
+            setError(message || 'Error fetching vectors')
         } finally {
             setLoading(false)
         }

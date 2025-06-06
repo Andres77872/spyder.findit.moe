@@ -1,5 +1,5 @@
 import { useRef, useEffect, useMemo } from 'react'
-import ForceGraph3D, { type ForceGraphMethods } from 'react-force-graph-3d'
+import ForceGraph3D, { type ForceGraphMethods, type NodeObject } from 'react-force-graph-3d'
 import * as THREE from 'three'
 
 type DataItem = { vector: number[]; img: string; query: string }
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export default function ForceGraph3DTemplate({ dataItems, onNodeClick }: Props) {
-  const fgRef = useRef<ForceGraphMethods | undefined>(undefined)
+  const fgRef = useRef<ForceGraphMethods<NodeObject<Node>, Link> | undefined>(undefined)
 
   const threshold = 0.75
   const textureLoaderRef = useRef<THREE.TextureLoader>(new THREE.TextureLoader())
@@ -60,7 +60,6 @@ export default function ForceGraph3DTemplate({ dataItems, onNodeClick }: Props) 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
       <ForceGraph3D
-        style={{ width: '100%', height: '100%' }}
         ref={fgRef}
         graphData={graphData}
         linkOpacity={0.5}
