@@ -1,4 +1,3 @@
-import React from 'react'
 import './Sidebar.css'
 
 type DataItem = { vector: number[]; img: string; query: string }

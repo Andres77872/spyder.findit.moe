@@ -1,4 +1,3 @@
-import React from 'react'
 import ForceGraph3DTemplate from '../ForceGraph3DTemplate'
 import './GraphContainer.css'
 
