@@ -1,0 +1,100 @@
+.landing-uploader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+}
+
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90vw;
+  max-width: 600px;
+  height: 400px;
+  background: var(--bg-primary);
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-md);
+}
+
+.upload-area:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.upload-area.active {
+  background: var(--bg-secondary);
+  border-color: var(--primary-color);
+  border-style: solid;
+}
+
+.upload-icon {
+  color: var(--text-tertiary);
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover .upload-icon,
+.upload-area.active .upload-icon {
+  color: var(--primary-color);
+  transform: scale(1.1);
+}
+
+.landing-content {
+  text-align: center;
+}
+
+.app-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.025em;
+}
+
+.title-find {
+  color: var(--text-primary);
+}
+
+.title-it {
+  color: var(--primary-color);
+}
+
+.app-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-weight: 400;
+}
+
+.upload-instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.main-instruction {
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.file-types {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 768px) {
+  .app-title {
+    font-size: 2.5rem;
+  }
+}

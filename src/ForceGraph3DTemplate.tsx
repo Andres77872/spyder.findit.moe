@@ -1,6 +1,7 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import ForceGraph3D, {type ForceGraphMethods, type NodeObject} from 'react-force-graph-3d'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import ForceGraph3D, { type ForceGraphMethods, type NodeObject } from 'react-force-graph-3d'
 import * as THREE from 'three'
+import './ForceGraph3DTemplate.css'
 
 type DataItem = { vector: number[]; img: string; query: string }
 type Node = DataItem & { id: string }

@@ -1,0 +1,29 @@
+
+/* App layout for loaded and expanded views */
+.app-container.loaded {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  position: relative;
+}
+
+.app-container.expanded .sidebar {
+  transform: translateX(-100%);
+  width: 0;
+  min-width: 0;
+  border-right: none;
+}
+
+.app-container.expanded .graph-container {
+  margin-left: 0;
+}
+
+@media (max-width: 768px) {
+  .app-container.loaded {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,36 @@
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  border-radius: var(--radius-sm);
+}
+
+.btn-icon:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.expand-toggle {
+  margin-left: 0;
+}
+
+.app-container.loaded .expand-toggle {
+  position: absolute;
+  top: 1.5rem;
+  left: 360px;
+  z-index: 2;
+  margin: 0;
+}
+
+.app-container.loaded.expanded .expand-toggle {
+  left: 1rem;
+}
+
+@media (max-width: 768px) {
+  .expand-toggle {
+    display: none;
+  }
+}
