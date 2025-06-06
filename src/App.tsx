@@ -48,7 +48,11 @@ export default function App() {
                 img: item.content?.[0]?.img,
                 query: item.content?.[0]?.query,
             }))
-            setDataItems(items)
+            // Remove duplicate items by image URL
+            const uniqueItems = items.filter((item, index, self) =>
+                self.findIndex(i => i.img === item.img) === index
+            )
+            setDataItems(uniqueItems)
         } catch (err: any) {
             console.error(err)
             setError(err.message || 'Error fetching vectors')
@@ -85,7 +89,18 @@ export default function App() {
                 img: item.content?.[0]?.img,
                 query: item.content?.[0]?.query,
             }))
-            setDataItems(prevItems => [...prevItems, ...items])
+            // Append only new items with unique image URLs
+            setDataItems(prevItems => {
+                const merged = [...prevItems]
+                const seen = new Set(prevItems.map(i => i.img))
+                for (const item of items) {
+                    if (!seen.has(item.img)) {
+                        seen.add(item.img)
+                        merged.push(item)
+                    }
+                }
+                return merged
+            })
         } catch (err: any) {
             console.error(err)
             setError(err.message || 'Error fetching vectors')

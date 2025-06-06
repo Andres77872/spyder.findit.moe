@@ -20,6 +20,8 @@ export default function ForceGraph3DTemplate({ dataItems, onNodeClick }: Props) 
   const fgRef = useRef<ForceGraphMethods | undefined>(undefined)
 
   const threshold = 0.75
+  const textureLoaderRef = useRef<THREE.TextureLoader>(new THREE.TextureLoader())
+  const textureCacheRef = useRef<Map<string, THREE.Texture>>(new Map())
 
   const graphData = useMemo<GraphData>(() => {
     const nodes: Node[] = dataItems.map((d, i) => ({
@@ -56,14 +58,19 @@ export default function ForceGraph3DTemplate({ dataItems, onNodeClick }: Props) 
   }, [graphData])
 
   return (
-    <div style={{ width: '100%', height: '100vh' }}>
+    <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
       <ForceGraph3D
+        style={{ width: '100%', height: '100%' }}
         ref={fgRef}
         graphData={graphData}
         linkOpacity={0.5}
         nodeThreeObject={(node: Node) => {
           const group = new THREE.Group()
-          const imgTexture = new THREE.TextureLoader().load(node.img)
+          let imgTexture = textureCacheRef.current.get(node.img)
+          if (!imgTexture) {
+            imgTexture = textureLoaderRef.current.load(node.img)
+            textureCacheRef.current.set(node.img, imgTexture)
+          }
           const imgMaterial = new THREE.SpriteMaterial({ map: imgTexture })
           const imgSprite = new THREE.Sprite(imgMaterial)
           const imgSize = 8
@@ -73,6 +80,22 @@ export default function ForceGraph3DTemplate({ dataItems, onNodeClick }: Props) 
         }}
         onNodeClick={onNodeClick}
       />
+      <div
+        style={{
+          position: 'absolute',
+          top: 10,
+          left: 10,
+          backgroundColor: 'rgba(255,255,255,0.8)',
+          padding: '6px 12px',
+          borderRadius: 4,
+          fontSize: 14,
+          color: '#000',
+          zIndex: 1,
+        }}
+      >
+        <div><strong>Nodes:</strong> {graphData.nodes.length}</div>
+        <div><strong>Edges:</strong> {graphData.links.length}</div>
+      </div>
     </div>
   )
 }
