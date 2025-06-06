@@ -1,8 +1,8 @@
-#root {
+/* Main application container */
+.app-container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
 .logo {
@@ -33,10 +33,42 @@
   }
 }
 
-.card {
-  padding: 2em;
+/* Upload area styling */
+.upload-area {
+  border: 2px dashed #888;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.upload-area.active {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
-.read-the-docs {
-  color: #888;
+.upload-label span {
+  font-size: 1rem;
+  color: #666;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+/* Control buttons */
+.controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* Error message */
+.error-message {
+  margin-top: 1rem;
+  color: #f44336;
+  font-weight: bold;
+  text-align: center;
 }

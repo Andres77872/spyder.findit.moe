@@ -11,12 +11,34 @@ export default function App() {
     const [dataItems, setDataItems] = useState<{ vector: number[]; img: string; query: string }[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [dragActive, setDragActive] = useState(false)
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0] ?? null
         setFile(f)
         setDataItems([])
         setError(null)
+    }
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        setDragActive(true)
+    }
+
+    const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        setDragActive(false)
+    }
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault()
+        setDragActive(false)
+        const f = e.dataTransfer.files?.[0] ?? null
+        if (f) {
+            setFile(f)
+            setDataItems([])
+            setError(null)
+        }
     }
 
     const handleUpload = async () => {
@@ -121,12 +143,50 @@ export default function App() {
     }
 
     return (
-        <div>
-            <input type="file" accept="image/*" onChange={handleFileChange}/>
-            <button onClick={handleUpload} disabled={!file || loading}>
-                {loading ? 'Uploading...' : 'Upload Image'}
-            </button>
-            {error && <p style={{color: 'red'}}>{error}</p>}
+        <div className="app-container">
+            <div
+                className={`upload-area${dragActive ? ' active' : ''}`}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+            >
+                <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                />
+                <label htmlFor="fileInput" className="upload-label">
+                    {file ? (
+                        <img
+                            src={URL.createObjectURL(file)}
+                            alt="Preview"
+                            className="preview-image"
+                        />
+                    ) : (
+                        <span>Drag & drop an image here, or click to select</span>
+                    )}
+                </label>
+            </div>
+            <div className="controls">
+                <button onClick={handleUpload} disabled={!file || loading}>
+                    {loading ? 'Searching...' : 'Search'}
+                </button>
+                {dataItems.length > 0 && !loading && (
+                    <button
+                        onClick={() => {
+                            setDataItems([])
+                            setFile(null)
+                            setError(null)
+                        }}
+                    >
+                        Clear Results
+                    </button>
+                )}
+            </div>
+            {error && <div className="error-message">{error}</div>}
             {dataItems.length > 0 && (
                 <ForceGraph3DTemplate
                     dataItems={dataItems}
