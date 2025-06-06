@@ -194,20 +194,6 @@ export default function App() {
                         <span className="title-find">Find</span>
                         <span className="title-it">It</span>
                     </h2>
-                    <button
-                        className="btn-icon expand-toggle"
-                        onClick={toggleExpandedView}
-                        title={expandedView ? "Show sidebar" : "Hide sidebar"}
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             strokeWidth="2">
-                            {expandedView ? (
-                                <polyline points="9 18 15 12 9 6"/>
-                            ) : (
-                                <polyline points="15 18 9 12 15 6"/>
-                            )}
-                        </svg>
-                    </button>
                 </div>
 
                 <div className="preview-section">
@@ -287,6 +273,20 @@ export default function App() {
                 )}
             </div>
 
+            <button
+                className="btn-icon expand-toggle"
+                onClick={toggleExpandedView}
+                title={expandedView ? 'Show sidebar' : 'Hide sidebar'}
+                aria-label={expandedView ? 'Show sidebar' : 'Hide sidebar'}
+            >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    {expandedView ? (
+                        <polyline points="9 18 15 12 9 6" />
+                    ) : (
+                        <polyline points="15 18 9 12 15 6" />
+                    )}
+                </svg>
+            </button>
             <div className="graph-container">
                 {loading && (
                     <div className="loading-overlay">

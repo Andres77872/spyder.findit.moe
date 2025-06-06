@@ -193,6 +193,7 @@ a:hover {
     display: flex;
     overflow: hidden;
     background: var(--bg-secondary);
+    position: relative;
 }
 
 /* ==================== SIDEBAR ==================== */
@@ -204,6 +205,7 @@ a:hover {
     border-right: 1px solid var(--border-color);
     overflow-y: auto;
     overflow-x: hidden;
+    transition: transform 0.3s ease, width 0.3s ease;
 }
 
 .sidebar-header {
@@ -434,7 +436,8 @@ button {
 
 /* ==================== GRAPH CONTAINER ==================== */
 .graph-container {
-    width: 100%;
+    flex: 1;
+    width: auto;
     position: relative;
     border: 1px solid var(--border-color);
     background-color: var(--bg-primary);
@@ -516,7 +519,7 @@ button {
 .graph-controls {
     position: absolute;
     top: 1rem;
-    left: 1rem;
+    right: 1rem;
     background: var(--bg-primary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -693,7 +696,7 @@ button {
 }
 
 .expand-toggle {
-    margin-left: auto;
+    margin-left: 0;
 }
 
 .sidebar-header {
@@ -704,11 +707,25 @@ button {
 
 .app-container.expanded .sidebar {
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    width: 0;
+    min-width: 0;
+    border-right: none;
 }
 
 .app-container.expanded .graph-container {
     margin-left: 0;
+}
+
+/* toggle always visible for collapsing/expanding sidebar */
+.app-container.loaded .expand-toggle {
+    position: absolute;
+    top: 1.5rem;
+    left: 360px;
+    z-index: 2;
+    margin: 0;
+}
+.app-container.loaded.expanded .expand-toggle {
+    left: 1rem;
 }
 
 @media (max-width: 768px) {
