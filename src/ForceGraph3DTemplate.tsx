@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import ForceGraph3D, { type ForceGraphMethods, type NodeObject } from 'react-force-graph-3d'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import ForceGraph3D, {type ForceGraphMethods, type NodeObject} from 'react-force-graph-3d'
 import * as THREE from 'three'
 import './ForceGraph3DTemplate.css'
 
@@ -117,7 +117,11 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
     )
 
     const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-        lastHoverPosRef.current = {x: e.clientX, y: e.clientY}
+        const rect = e.currentTarget.getBoundingClientRect()
+        lastHoverPosRef.current = {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+        }
         if (!frameRequestedRef.current) {
             frameRequestedRef.current = true
             requestAnimationFrame(() => {
