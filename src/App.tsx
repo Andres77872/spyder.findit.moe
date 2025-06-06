@@ -12,6 +12,7 @@ export default function App() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [dragActive, setDragActive] = useState(false)
+    const [expandedView, setExpandedView] = useState(false)
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const f = e.target.files?.[0] ?? null
@@ -140,6 +141,10 @@ export default function App() {
         }
     }
 
+    const toggleExpandedView = () => {
+        setExpandedView(!expandedView)
+    }
+
     if (!file) {
         return (
             <div
@@ -182,13 +187,27 @@ export default function App() {
     }
 
     return (
-        <div className="app-container loaded">
+        <div className={`app-container loaded ${expandedView ? 'expanded' : ''}`}>
             <div className="sidebar">
                 <div className="sidebar-header">
                     <h2 className="sidebar-title">
                         <span className="title-find">Find</span>
                         <span className="title-it">It</span>
                     </h2>
+                    <button
+                        className="btn-icon expand-toggle"
+                        onClick={toggleExpandedView}
+                        title={expandedView ? "Show sidebar" : "Hide sidebar"}
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             strokeWidth="2">
+                            {expandedView ? (
+                                <polyline points="9 18 15 12 9 6"/>
+                            ) : (
+                                <polyline points="15 18 9 12 15 6"/>
+                            )}
+                        </svg>
+                    </button>
                 </div>
 
                 <div className="preview-section">
@@ -234,6 +253,7 @@ export default function App() {
                             setDataItems([]);
                             setError(null);
                             setDragActive(false);
+                            setExpandedView(false);
                         }}
                         disabled={loading}
                     >
@@ -280,6 +300,7 @@ export default function App() {
                     <ForceGraph3DTemplate
                         dataItems={dataItems}
                         onNodeClick={handleNodeClick}
+                        loading={loading}
                     />
                 )}
                 {dataItems.length === 0 && !loading && (
