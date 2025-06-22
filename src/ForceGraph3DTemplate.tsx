@@ -18,11 +18,40 @@ interface Props {
     loading?: boolean
 }
 
+const THRESHOLD_STORAGE_KEY = 'findit-similarity-threshold'
+const DEFAULT_THRESHOLD = 0.75
+
+// Helper functions for localStorage
+const loadThresholdFromStorage = (): number => {
+    try {
+        const stored = localStorage.getItem(THRESHOLD_STORAGE_KEY)
+        if (stored !== null) {
+            const parsed = parseFloat(stored)
+            if (!isNaN(parsed) && parsed >= 0 && parsed <= 1) {
+                return parsed
+            }
+        }
+    } catch (error) {
+        console.warn('Failed to load threshold from localStorage:', error)
+    }
+    return DEFAULT_THRESHOLD
+}
+
+const saveThresholdToStorage = (threshold: number): void => {
+    try {
+        localStorage.setItem(THRESHOLD_STORAGE_KEY, threshold.toString())
+    } catch (error) {
+        console.warn('Failed to save threshold to localStorage:', error)
+    }
+}
+
 export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: Props) {
     const fgRef = useRef<ForceGraphMethods<NodeObject<Node>, Link> | undefined>(undefined)
 
-    const [threshold, setThreshold] = useState(0.75)
+    // Initialize threshold from localStorage
+    const [threshold, setThreshold] = useState(() => loadThresholdFromStorage())
     const [autoRotate, setAutoRotate] = useState(false)
+    const animationFrameRef = useRef<number | null>(null)
     const textureLoaderRef = useRef(new THREE.TextureLoader())
     const textureCacheRef = useRef<Map<string, THREE.Texture>>(new Map())
 
@@ -30,6 +59,12 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
     const [hoverPos, setHoverPos] = useState({x: 0, y: 0})
     const lastHoverPosRef = useRef({x: 0, y: 0})
     const frameRequestedRef = useRef(false)
+
+    // Handler for threshold changes with localStorage persistence
+    const handleThresholdChange = useCallback((newThreshold: number) => {
+        setThreshold(newThreshold)
+        saveThresholdToStorage(newThreshold)
+    }, [])
 
     const nodes = useMemo<Node[]>(
         () =>
@@ -72,20 +107,39 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
     }, [graphData.links])
 
     useEffect(() => {
+        // Clean up any existing animation
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current)
+            animationFrameRef.current = null
+        }
+
         if (autoRotate && fgRef.current) {
             const fg = fgRef.current
             const distance = 800
             let angle = 0
             
             const animate = () => {
-                if (!autoRotate) return
+                // Check if we should continue rotating
+                if (!autoRotate) {
+                    animationFrameRef.current = null
+                    return
+                }
+                
                 angle += 0.005
                 const x = distance * Math.sin(angle)
                 const z = distance * Math.cos(angle)
                 fg.cameraPosition({x, y: 200, z}, {x: 0, y: 0, z: 0})
-                requestAnimationFrame(animate)
+                animationFrameRef.current = requestAnimationFrame(animate)
             }
-            animate()
+            animationFrameRef.current = requestAnimationFrame(animate)
+        }
+
+        // Cleanup function
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current)
+                animationFrameRef.current = null
+            }
         }
     }, [autoRotate])
 
@@ -120,6 +174,10 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
 
     const resetCamera = useCallback(() => {
         fgRef.current?.cameraPosition({x: 0, y: 0, z: 300}, {x: 0, y: 0, z: 0}, 1000)
+    }, [])
+
+    const toggleAutoRotate = useCallback(() => {
+        setAutoRotate(prev => !prev)
     }, [])
 
     const graphComponent = useMemo(
@@ -181,7 +239,7 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
                                 max={1}
                                 step={0.01}
                                 value={threshold}
-                                onChange={e => setThreshold(parseFloat(e.target.value))}
+                                onChange={e => handleThresholdChange(parseFloat(e.target.value))}
                                 className="threshold-slider"
                                 style={{'--value': `${threshold * 100}%`} as React.CSSProperties}
                             />
@@ -201,7 +259,7 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
                     </button>
                     <button 
                         className="btn-graph" 
-                        onClick={() => setAutoRotate(!autoRotate)} 
+                        onClick={toggleAutoRotate} 
                         title={autoRotate ? "Stop rotation" : "Start rotation"}
                     >
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
