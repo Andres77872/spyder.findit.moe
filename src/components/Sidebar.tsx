@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import './Sidebar.css'
 
 type DataItem = { vector: number[]; img: string; query: string }
@@ -19,6 +20,14 @@ export default function Sidebar({
   onUpload,
   onClear,
 }: Props) {
+  const handleMouseMove = useRef((e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    e.currentTarget.style.setProperty('--x', `${x}%`)
+    e.currentTarget.style.setProperty('--y', `${y}%`)
+  }).current
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -36,7 +45,7 @@ export default function Sidebar({
             className="preview-image"
           />
           <div className="image-info">
-            <p className="file-name">{file.name}</p>
+            <p className="file-name" title={file.name}>{file.name}</p>
             <p className="file-size">{(file.size / 1024).toFixed(1)} KB</p>
           </div>
         </div>
@@ -47,6 +56,7 @@ export default function Sidebar({
           className="btn btn-primary"
           onClick={onUpload}
           disabled={loading}
+          onMouseMove={handleMouseMove}
         >
           {loading ? (
             <>
@@ -68,6 +78,7 @@ export default function Sidebar({
           className="btn btn-secondary"
           onClick={onClear}
           disabled={loading}
+          onMouseMove={handleMouseMove}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                strokeWidth="2">
@@ -94,7 +105,7 @@ export default function Sidebar({
         <div className="results-info">
           <h3>Results</h3>
           <p>{dataItems.length} similar images found</p>
-          <p className="hint">Click any node to expand search</p>
+          <p className="hint">Click any node in the graph to expand your search</p>
         </div>
       )}
       <div className="sidebar-footer">

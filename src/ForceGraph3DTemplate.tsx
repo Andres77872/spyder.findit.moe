@@ -22,6 +22,7 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
     const fgRef = useRef<ForceGraphMethods<NodeObject<Node>, Link> | undefined>(undefined)
 
     const [threshold, setThreshold] = useState(0.75)
+    const [autoRotate, setAutoRotate] = useState(false)
     const textureLoaderRef = useRef(new THREE.TextureLoader())
     const textureCacheRef = useRef<Map<string, THREE.Texture>>(new Map())
 
@@ -70,6 +71,24 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
         }
     }, [graphData.links])
 
+    useEffect(() => {
+        if (autoRotate && fgRef.current) {
+            const fg = fgRef.current
+            const distance = 800
+            let angle = 0
+            
+            const animate = () => {
+                if (!autoRotate) return
+                angle += 0.005
+                const x = distance * Math.sin(angle)
+                const z = distance * Math.cos(angle)
+                fg.cameraPosition({x, y: 200, z}, {x: 0, y: 0, z: 0})
+                requestAnimationFrame(animate)
+            }
+            animate()
+        }
+    }, [autoRotate])
+
     const handleNodeHover = useCallback((node: NodeObject<Node> | null) => setHoveredNode(node), [])
 
     const handleNodeClick = useCallback(
@@ -98,6 +117,10 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
         },
         []
     )
+
+    const resetCamera = useCallback(() => {
+        fgRef.current?.cameraPosition({x: 0, y: 0, z: 300}, {x: 0, y: 0, z: 0}, 1000)
+    }, [])
 
     const graphComponent = useMemo(
         () => (
@@ -138,11 +161,11 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
             <div className="graph-controls">
                 <div className="graph-stats">
                     <div className="stat-item">
-                        <span className="stat-label">Nodes:</span>
+                        <span className="stat-label">Nodes</span>
                         <span className="stat-value">{graphData.nodes.length}</span>
                     </div>
                     <div className="stat-item">
-                        <span className="stat-label">Edges:</span>
+                        <span className="stat-label">Edges</span>
                         <span className="stat-value">{graphData.links.length}</span>
                     </div>
                 </div>
@@ -160,10 +183,36 @@ export default function ForceGraph3DTemplate({dataItems, onNodeClick, loading}: 
                                 value={threshold}
                                 onChange={e => setThreshold(parseFloat(e.target.value))}
                                 className="threshold-slider"
+                                style={{'--value': `${threshold * 100}%`} as React.CSSProperties}
                             />
                             <span className="threshold-value">{threshold.toFixed(2)}</span>
                         </div>
                     </label>
+                </div>
+                
+                <div className="graph-actions">
+                    <button className="btn-graph" onClick={resetCamera} title="Reset camera view">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M1 1l6 6m0 0V3m0 4H3"/>
+                            <path d="M3 11V9a6 6 0 0 1 12 0v2M21 21l-6-6m0 0v4m0-4h4"/>
+                            <path d="M21 13v2a6 6 0 0 1-12 0v-2"/>
+                        </svg>
+                        Reset
+                    </button>
+                    <button 
+                        className="btn-graph" 
+                        onClick={() => setAutoRotate(!autoRotate)} 
+                        title={autoRotate ? "Stop rotation" : "Start rotation"}
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            {autoRotate ? (
+                                <rect x="6" y="6" width="12" height="12" rx="1"/>
+                            ) : (
+                                <path d="M23 12a11 11 0 1 1-22 0 11 11 0 0 1 22 0zm-5 0a6 6 0 1 1-12 0 6 6 0 0 1 12 0z"/>
+                            )}
+                        </svg>
+                        {autoRotate ? 'Stop' : 'Rotate'}
+                    </button>
                 </div>
             </div>
 
